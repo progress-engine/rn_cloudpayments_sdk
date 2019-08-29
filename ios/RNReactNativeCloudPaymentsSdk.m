@@ -6,6 +6,7 @@
 RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(isValidNumber: (NSString *)cardNumber
+				  resolve: (RCTPromiseResolveBlock)resolve
 				  reject: (RCTPromiseRejectBlock)reject)
 {
 	if([Card isCardNumberValid: cardNumber]) {
