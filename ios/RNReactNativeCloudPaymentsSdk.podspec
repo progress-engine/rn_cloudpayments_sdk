@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "author@domain.cn" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/alexeyz-PE/react-native-cloud-payments-sdk.git", :tag => "master" }
-  s.source_files  = "RNReactNativeCloudPaymentsSdk/**/*.{h,m}"
+  #s.source_files  = "RNReactNativeCloudPaymentsSdk/**/*.{h,m}"
   s.requires_arc = true
 
 
