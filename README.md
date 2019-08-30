@@ -1,9 +1,9 @@
 
-# react-native-react-native-cloud-payments-sdk
+# react-native-cloud-payments-sdk
 
 ## Getting started
 
-`$ npm install react-native-react-native-cloud-payments-sdk --save`
+`$ npm install react-native-cloud-payments-sdk --save`
 
 #### IOS
 
@@ -11,7 +11,7 @@
 
 ## Usage
 ```javascript
-import RNReactNativeCloudPaymentsSdk from 'react-native-react-native-cloud-payments-sdk';
+import RNReactNativeCloudPaymentsSdk from 'react-native-cloud-payments-sdk';
 
  const demoCard = {
     number: "5105105105105100",
