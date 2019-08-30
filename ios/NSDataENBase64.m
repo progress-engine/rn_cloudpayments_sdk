@@ -1,42 +1,10 @@
-//
-//  NSData+ENBase64.m
-//  base64
-//
-//  Created by Matt Gallagher on 2009/06/03.
-//  Copyright 2009 Matt Gallagher. All rights reserved.
-//
-//  This software is provided 'as-is', without any express or implied
-//  warranty. In no event will the authors be held liable for any damages
-//  arising from the use of this software. Permission is granted to anyone to
-//  use this software for any purpose, including commercial applications, and to
-//  alter it and redistribute it freely, subject to the following restrictions:
-//
-//  1. The origin of this software must not be misrepresented; you must not
-//     claim that you wrote the original software. If you use this software
-//     in a product, an acknowledgment in the product documentation would be
-//     appreciated but is not required.
-//  2. Altered source versions must be plainly marked as such, and must not be
-//     misrepresented as being the original software.
-//  3. This notice may not be removed or altered from any source
-//     distribution.
-//
-
 #import "NSDataENBase64.h"
 
-//
-// Mapping from 6 bit pattern to ASCII character.
-//
 static unsigned char base64EncodeLookup[65] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-//
-// Definition for "masked-out" areas of the base64DecodeLookup mapping
-//
 #define xx 65
 
-//
-// Mapping from ASCII character to 6 bit pattern.
-//
 static unsigned char base64DecodeLookup[256] =
 {
     xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
@@ -57,25 +25,9 @@ static unsigned char base64DecodeLookup[256] =
     xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
 };
 
-//
-// Fundamental sizes of the binary and base64 encode/decode units in bytes
-//
 #define BINARY_UNIT_SIZE 3
 #define BASE64_UNIT_SIZE 4
 
-//
-// NewBase64Decode
-//
-// Decodes the base64 ASCII string in the inputBuffer to a newly malloced
-// output buffer.
-//
-//  inputBuffer - the source ASCII string for the decode
-//    length - the length of the string or -1 (to specify strlen should be used)
-//    outputLength - if not-NULL, on output will contain the decoded length
-//
-// returns the decoded buffer. Must be free'd by caller. Length is given by
-//    outputLength.
-//
 void *NewBase64Decode(
                       const char *inputBuffer,
                       size_t length,
@@ -95,9 +47,6 @@ void *NewBase64Decode(
     size_t j = 0;
     while (i < length)
     {
-        //
-        // Accumulate 4 valid characters (ignore everything else)
-        //
         unsigned char accumulated[BASE64_UNIT_SIZE];
         size_t accumulateIndex = 0;
         while (i < length)
@@ -115,11 +64,6 @@ void *NewBase64Decode(
             }
         }
         
-        //
-        // Store the 6 bits from each of the 4 characters as 3 bytes
-        //
-        // (Uses improved bounds checking suggested by Alexandre Colucci)
-        //
         if(accumulateIndex >= 2)
         outputBuffer[j] = (accumulated[0] << 2) | (accumulated[1] >> 4);
         if(accumulateIndex >= 3)
@@ -136,22 +80,6 @@ void *NewBase64Decode(
     return outputBuffer;
 }
 
-//
-// NewBase64Encode
-//
-// Encodes the arbitrary data in the inputBuffer as base64 into a newly malloced
-// output buffer.
-//
-//  inputBuffer - the source data for the encode
-//    length - the length of the input in bytes
-//  separateLines - if zero, no CR/LF characters will be added. Otherwise
-//        a CR/LF pair will be added every 64 encoded chars.
-//    outputLength - if not-NULL, on output will contain the encoded length
-//        (not including terminating 0 char)
-//
-// returns the encoded buffer. Must be free'd by caller. Length is given by
-//    outputLength.
-//
 char *NewBase64Encode(
                       const void *buffer,
                       size_t length,
@@ -165,9 +93,6 @@ char *NewBase64Encode(
 #define INPUT_LINE_LENGTH ((OUTPUT_LINE_LENGTH / BASE64_UNIT_SIZE) * BINARY_UNIT_SIZE)
 #define CR_LF_SIZE 2
     
-    //
-    // Byte accurate calculation of final buffer size
-    //
     size_t outputBufferSize =
     ((length / BINARY_UNIT_SIZE)
      + ((length % BINARY_UNIT_SIZE) ? 1 : 0))
@@ -178,14 +103,8 @@ char *NewBase64Encode(
         (outputBufferSize / OUTPUT_LINE_LENGTH) * CR_LF_SIZE;
     }
     
-    //
-    // Include space for a terminating zero
-    //
     outputBufferSize += 1;
     
-    //
-    // Allocate the output buffer
-    //
     char *outputBuffer = (char *)malloc(outputBufferSize);
     if (!outputBuffer)
     {
@@ -206,9 +125,6 @@ char *NewBase64Encode(
         
         for (; i + BINARY_UNIT_SIZE - 1 < lineEnd; i += BINARY_UNIT_SIZE)
         {
-            //
-            // Inner loop: turn 48 bytes into 64 base64 characters
-            //
             outputBuffer[j++] = base64EncodeLookup[(inputBuffer[i] & 0xFC) >> 2];
             outputBuffer[j++] = base64EncodeLookup[((inputBuffer[i] & 0x03) << 4)
                                                    | ((inputBuffer[i + 1] & 0xF0) >> 4)];
@@ -222,9 +138,6 @@ char *NewBase64Encode(
             break;
         }
         
-        //
-        // Add the newline
-        //
         outputBuffer[j++] = '\r';
         outputBuffer[j++] = '\n';
         lineEnd += lineLength;
@@ -232,9 +145,6 @@ char *NewBase64Encode(
     
     if (i + 1 < length)
     {
-        //
-        // Handle the single '=' case
-        //
         outputBuffer[j++] = base64EncodeLookup[(inputBuffer[i] & 0xFC) >> 2];
         outputBuffer[j++] = base64EncodeLookup[((inputBuffer[i] & 0x03) << 4)
                                                | ((inputBuffer[i + 1] & 0xF0) >> 4)];
@@ -243,9 +153,6 @@ char *NewBase64Encode(
     }
     else if (i < length)
     {
-        //
-        // Handle the double '=' case
-        //
         outputBuffer[j++] = base64EncodeLookup[(inputBuffer[i] & 0xFC) >> 2];
         outputBuffer[j++] = base64EncodeLookup[(inputBuffer[i] & 0x03) << 4];
         outputBuffer[j++] = '=';
@@ -253,9 +160,6 @@ char *NewBase64Encode(
     }
     outputBuffer[j] = 0;
     
-    //
-    // Set the output length and return the buffer
-    //
     if (outputLength)
     {
         *outputLength = j;
@@ -265,17 +169,6 @@ char *NewBase64Encode(
 
 @implementation NSDataENBase64 : NSData
 
-//
-// dataFromBase64String:
-//
-// Creates an NSData object containing the base64 decoded representation of
-// the base64 string 'aString'
-//
-// Parameters:
-//    aString - the base64 string to decode
-//
-// returns the autoreleased NSData representation of the base64 string
-//
 + (NSData *)dataFromBase64String:(NSString *)aString
 {
     NSData *data = [aString dataUsingEncoding:NSASCIIStringEncoding];
@@ -300,15 +193,6 @@ char *NewBase64Encode(
     return result;
 }
 
-//
-// base64EncodedString
-//
-// Creates an NSString object that contains the base 64 encoding of the
-// receiver's data. Lines are broken at 64 characters long.
-//
-// returns an autoreleased NSString being the base 64 representation of the
-//    receiver.
-//
 - (NSString *)base64EncodedString
 {
     size_t outputLength = 0;
