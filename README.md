@@ -7,7 +7,7 @@
 
 #### IOS
 
-`$ cd ios && pod install
+`$ cd ios && pod install`
 
 ## Usage
 ```javascript
