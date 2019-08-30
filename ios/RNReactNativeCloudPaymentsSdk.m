@@ -35,9 +35,9 @@ RCT_EXPORT_METHOD(getType: (NSString *)cardNumber
 }
 
 RCT_EXPORT_METHOD(createCryptogram: (NSString *)cardNumber
-				  cardExp: (NSString *)cardExp
-				  cardCvv: (NSString *)cardCvv
-				  publicId: (NSString *)publicId
+                  cardExp: (NSString *)cardExp
+		  cardCvv: (NSString *)cardCvv
+		  publicId: (NSString *)publicId
                   resolve: (RCTPromiseResolveBlock)resolve
                   reject: (RCTPromiseRejectBlock)reject)
 {
