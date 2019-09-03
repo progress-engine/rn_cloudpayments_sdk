@@ -15,7 +15,7 @@ import RNReactNativeCloudPaymentsSdk from 'react-native-cloud-payments-sdk';
 
  const demoCard = {
     number: "5105105105105100",
-    extDate: "10/18",
+    extDate: Platform.OS === "ios" ? "10/21" : "1021",
     cvvCode: "123",
   };
   
